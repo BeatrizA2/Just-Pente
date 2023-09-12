@@ -56,3 +56,40 @@ while True:
 
 # Close the socket connection
 client_socket.close()
+
+# Create an array of landmarks from a csv file
+def create_pose_arrays(path):
+    arr = []
+
+    with open(path, 'r') as file:
+        for line in file:
+            line_str = line.strip().split(',')  # Split the line using commas and remove leading/trailing whitespace
+            line_str = line_str[:-1]
+            poses = []
+
+            for i in range(0, len(line_str) - 1, 3):
+                poses.append([int(line_str[i]), int(line_str[i + 1]), int(line_str[i + 2])])
+
+            arr.append(poses)
+
+    return arr
+
+# Both params are arrays of landmarks with same length
+def compare_poses(landmarks1, landmarks2):
+    distances = 0
+    n_comparisons = 0
+
+    for i in range(min(len(landmarks2), len(landmarks1))):
+
+        for edge in CONTOURS_LANDMARKS:
+            vector1 = (landmarks1[i][edge[0]][0] - landmarks1[i][edge[1]][0], landmarks1[i][edge[0]][1] - landmarks1[i][edge[1]][1])
+
+            vector2 = (landmarks2[i][edge[0]][0] - landmarks2[i][edge[1]][0], landmarks2[i][edge[0]][1] - landmarks2[i][edge[1]][1])
+            
+            cos = np.dot(vector1, webcam) / (np.linalg.norm(vector1) * np.linalg.norm(vector2))
+
+            distances += cos
+
+            n_comparisons += 1
+    
+    return np.round(float(distances / n_comparisons)) * 10
