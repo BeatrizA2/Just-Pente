@@ -3,6 +3,21 @@ from cvzone.PoseModule import PoseDetector
 import socket
 import json
 
+CONTOURS_LANDMARKS = [
+    # https://developers.google.com/mediapipe/solutions/vision/pose_landmarker/
+    (7,8),
+    (12,11),
+    (12, 14),
+    (14,16),
+    (11, 13),
+    (13, 15),
+    (24, 23),
+    (24, 26),
+    (26, 28),
+    (23, 25),
+    (25, 27)
+]
+
 # Unity settings
 unity_ip = '127.0.0.1'
 unity_port = 25001
