@@ -2,6 +2,7 @@ import cv2 as cv
 from cvzone.PoseModule import PoseDetector
 import socket
 import json
+import numpy as np
 
 CONTOURS_LANDMARKS = [
     # https://developers.google.com/mediapipe/solutions/vision/pose_landmarker/
@@ -101,10 +102,10 @@ def compare_poses(landmarks1, landmarks2):
 
             vector2 = (landmarks2[i][edge[0]][0] - landmarks2[i][edge[1]][0], landmarks2[i][edge[0]][1] - landmarks2[i][edge[1]][1])
             
-            cos = np.dot(vector1, webcam) / (np.linalg.norm(vector1) * np.linalg.norm(vector2))
+            cos = np.dot(vector1, vector2) / (np.linalg.norm(vector1) * np.linalg.norm(vector2))
 
             distances += cos
 
             n_comparisons += 1
     
-    return np.round(float(distances / n_comparisons)) * 10
+    return np.round(float(distances / n_comparisons) * 10)
