@@ -1,12 +1,15 @@
 import os
 import cv2 as cv
 from cvzone.PoseModule import PoseDetector
+import numpy as np
 
 
 def createFile(filepath, positionsList):
     with open(filepath, 'w') as f:
         f.writelines(["%s\n" % item for item in positionsList])
 
+def extractPoses():
+    video = cv.VideoCapture('Videos/cupid.mp4')
 
 # Path to the directory containing video files
 videos_folder = 'Videos/'
@@ -59,6 +62,8 @@ for video_file in video_files:
             positionsList.append(landmarkStr)
             comparisonList.append(lmStr)
 
+            for i in range(0, len(line_str) - 1, 2):
+                poses.append((float(line_str[i]), float(line_str[i + 1])))
 
         cv.imshow("Image", img)
         key = cv.waitKey(1)
