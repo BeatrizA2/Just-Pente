@@ -13,6 +13,8 @@ public class Score : MonoBehaviour
     public int listenPort = 25001;
     private TcpListener listener;
     private string comparisonValue = "0";
+    private float totalComparisonValue = 0f;
+    private int receivedValueCount = 0;
     TcpClient client;
 
     private void Start()
@@ -41,8 +43,11 @@ public class Score : MonoBehaviour
             string comparisonValueStr = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
             comparisonValue = comparisonValueStr;
+            float value = float.Parse(comparisonValueStr);
+            totalComparisonValue += value;
+            receivedValueCount++;
 
-            
+
         }
         
     }
@@ -55,6 +60,9 @@ public class Score : MonoBehaviour
 
     private void OnDestroy()
     {
+        float averageComparisonValue = totalComparisonValue / receivedValueCount;
+        PlayerPrefs.SetFloat("Score", averageComparisonValue);
+
         // Fecha a conexão
         client.Close();
         // Fecha a escuta quando o objeto for destruído
