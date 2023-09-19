@@ -8,9 +8,6 @@ def createFile(filepath, positionsList):
     with open(filepath, 'w') as f:
         f.writelines(["%s\n" % item for item in positionsList])
 
-def extractPoses():
-    video = cv.VideoCapture('Videos/cupid.mp4')
-
 # Path to the directory containing video files
 videos_folder = 'Videos/'
 
@@ -56,14 +53,12 @@ for video_file in video_files:
             lmStr = ''
             for lm in landmarksList:
                 landmarkStr += f'{lm[1]},{img.shape[0] - lm[2]},{lm[3]},'
-                lmStr += f'{lm[1]},{lm[2]},{lm[3]},'
+                lmStr += f'{lm[0]},{lm[1]},{lm[2]},{lm[3]},'
 
 
             positionsList.append(landmarkStr)
             comparisonList.append(lmStr)
 
-            for i in range(0, len(line_str) - 1, 2):
-                poses.append((float(line_str[i]), float(line_str[i + 1])))
 
         cv.imshow("Image", img)
         key = cv.waitKey(1)
