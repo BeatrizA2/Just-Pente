@@ -9,7 +9,7 @@ public class ScoreManager : MonoBehaviour
     private void Start()
     {
         float finalScore = PlayerPrefs.GetFloat("Score");
-        scoreText.text = finalScore.ToString();
+        scoreText.text = finalScore.ToString("F2");
     }
 
     public void Continuar()
