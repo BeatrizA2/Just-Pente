@@ -36,8 +36,8 @@ public class AnimationDance : MonoBehaviour
     {
         if (!audioSource.isPlaying)
         {
-            // Transition to the "Slider" scene.
-            SceneManager.LoadScene("Slider");
+            // Transition to the "ScoreBoard" scene.
+            SceneManager.LoadScene("ScoreBoard");
         }
 
         string[] points = lines[counter].Split(',');
