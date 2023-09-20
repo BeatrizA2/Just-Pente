@@ -110,10 +110,10 @@ while True:
 
         except:
             print("Conexão encerrada.")
+            client_socket.close()
             break
 
         key = cv.waitKey(1)
 
     # Close the socket connections
-    client_socket.close()
     button_text_socket.close()
