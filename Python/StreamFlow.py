@@ -25,16 +25,6 @@ unity_port = 25001
 frame_counter = 0
 
 
-# Create a socket for receiving button text from Unity
-button_text_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-button_text_socket.bind(("127.0.0.1", 25002))
-button_text_socket.listen(1)
-
-# Accept a connection and receive the button text from Unity
-button_text_connection, addr = button_text_socket.accept()
-button_text = button_text_connection.recv(1024).decode()
-button_text_connection.close()
-
 # Create an array of landmarks from a csv file
 def create_pose_arrays(path):
     arr = []
@@ -71,48 +61,59 @@ def compare_poses(landmarks1, landmarks2):
     
     return np.round(float(distances / n_comparisons) * 10)
 
-video = cv.VideoCapture(0)
-
-detector = PoseDetector()
-positionsList = []
-
-# Espera até que o texto do botão seja recebido
-while not button_text:
-    pass
-
-reference_landmarks = create_pose_arrays(f'Comparison files/{button_text}.txt')
-
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((unity_ip, unity_port))
-
 while True:
-    frameExist, img = video.read()
+    # Create a socket for receiving button text from Unity
+    button_text_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    button_text_socket.bind(("127.0.0.1", 25002))
+    button_text_socket.listen(1)
 
-    if not frameExist or frame_counter > len(reference_landmarks):
-        break
+    # Accept a connection and receive the button text from Unity
+    button_text_connection, addr = button_text_socket.accept()
+    button_text = button_text_connection.recv(1024).decode()
+    button_text_connection.close()
 
-    img = detector.findPose(img)
-    landmarksList, boundingBox = detector.findPosition(img)
+    video = cv.VideoCapture(0)
 
-    # Compare the poses and get the comparison value
-    comparison_value = compare_poses(landmarksList, reference_landmarks[frame_counter])
-    frame_counter += 1
+    detector = PoseDetector()
+    positionsList = []
 
-    # Send the comparison value to Unity
-    try:
-        # Convert the data to a JSON string
-        data_str = json.dumps(comparison_value)
+    # Espera até que o texto do botão seja recebido
+    while not button_text:
+        pass
 
-        # Send the JSON data to Unity
-        client_socket.sendall(data_str.encode())
+    reference_landmarks = create_pose_arrays(f'Comparison files/{button_text}.txt')
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((unity_ip, unity_port))
+
+    while True:
+        frameExist, img = video.read()
+
+        if not frameExist or frame_counter > len(reference_landmarks):
+            break
+
+        img = detector.findPose(img)
+        landmarksList, boundingBox = detector.findPosition(img)
+
+        # Compare the poses and get the comparison value
+        comparison_value = compare_poses(landmarksList, reference_landmarks[frame_counter])
+        frame_counter += 1
+
+        # Send the comparison value to Unity
+        try:
+            # Convert the data to a JSON string
+            data_str = json.dumps(comparison_value)
+
+            # Send the JSON data to Unity
+            client_socket.sendall(data_str.encode())
 
 
-    except:
-        print("Conexão encerrada.")
-        break
+        except:
+            print("Conexão encerrada.")
+            break
 
-    key = cv.waitKey(1)
+        key = cv.waitKey(1)
 
-# Close the socket connections
-client_socket.close()
-button_text_socket.close()
+    # Close the socket connections
+    client_socket.close()
+    button_text_socket.close()
