@@ -95,6 +95,8 @@ while True:
         img = detector.findPose(img)
         landmarksList, boundingBox = detector.findPosition(img)
 
+
+
         # Compare the poses and get the comparison value
         comparison_value = compare_poses(landmarksList, reference_landmarks[frame_counter])
         frame_counter += 1
@@ -113,6 +115,7 @@ while True:
             client_socket.close()
             break
 
+        cv.imshow("webcam", img)
         key = cv.waitKey(1)
 
     # Close the socket connections
